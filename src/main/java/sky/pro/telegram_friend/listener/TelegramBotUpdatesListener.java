@@ -24,17 +24,14 @@ import static sky.pro.telegram_friend.model.ConstantsForText.*;
 
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
-    private final TelegramFriendApplication telegramFriendApplication;
-    private final BotService botService;
-    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final BotService  botService;
+    private final Logger      logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final TelegramBot telegramBot;
 
-    public TelegramBotUpdatesListener(TelegramFriendApplication telegramFriendApplication, BotService botService, TelegramBot telegramBot) {
-        this.telegramFriendApplication = telegramFriendApplication;
+    public TelegramBotUpdatesListener(BotService botService, TelegramBot telegramBot) {
         this.botService = botService;
         this.telegramBot = telegramBot;
     }
-
-    private final TelegramBot telegramBot;
 
     @PostConstruct
     public void init() {
@@ -60,7 +57,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 if (textMessage.startsWith(TEXT_START)) {
                     sendGreeting(chatId, TEXT_GREETING);
                     sendEmoji(chatId, EMOJI_KISSING);
-
                 } else {
                     if (botService.isGoodPattern(textMessage)) {
                         botService.saveMessage(chatId, textMessage);

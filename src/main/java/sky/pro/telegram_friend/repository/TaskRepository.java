@@ -14,5 +14,5 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<NotificationTask, Long>{
     @Query(value = "SELECT *  FROM notification_task WHERE stamp = ?1 AND status = false", nativeQuery = true)
-    List<NotificationTask> findAll(LocalDateTime localDateTime);
+    List<NotificationTask> findAllScheduledTasks(LocalDateTime localDateTime);
 }
