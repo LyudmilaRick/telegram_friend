@@ -3,9 +3,12 @@ package sky.pro.telegram_friend.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import sky.pro.telegram_friend.excepton.InvalidArgumentException;
 import sky.pro.telegram_friend.model.NotificationTask;
 import sky.pro.telegram_friend.repository.TaskRepository;
 
+import javax.naming.directory.InvalidAttributeIdentifierException;
+import javax.naming.directory.InvalidAttributesException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -13,7 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static sky.pro.telegram_friend.model.ConstantsForText.STRING_FORMAT;
+import static sky.pro.telegram_friend.model.ConstantsForText.*;
 
 
 @Service
@@ -51,12 +54,12 @@ public class BotServiceImpl implements BotService {
     @Override
     public List<NotificationTask> getAll() {
         LocalDateTime localDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        return taskRepository.findAll(localDateTime);
+        return taskRepository.findAllScheduledTasks(localDateTime);
 
     }
 
     @Override
-    public void setItemFromDataBase(Long id) {
+    public void setItemFromDataBase(Long id)  {
         NotificationTask notificationTask = getItemFromDataBase(id);
         notificationTask.setStatus(true);
         taskRepository.save(notificationTask);
@@ -66,7 +69,7 @@ public class BotServiceImpl implements BotService {
      * разобрать строку на составляющие и сложить по полям
      */
     private NotificationTask parseMessage(Long chatId, String textMessage) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(STRING_PATTERN);
         NotificationTask notificationTask = new NotificationTask();
         Pattern pattern = Pattern.compile(STRING_FORMAT);
         try {
@@ -92,7 +95,7 @@ public class BotServiceImpl implements BotService {
      */
     private NotificationTask getItemFromDataBase(Long id) {
         return taskRepository.findById(id)
-                .orElseThrow(NullPointerException::new);
-    }
+                .orElseThrow(()-> new InvalidArgumentException("Информация по идентификатору не найдена" + id));
 
+    }
 }
